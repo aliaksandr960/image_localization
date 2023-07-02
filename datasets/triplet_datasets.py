@@ -113,6 +113,7 @@ class LocalTripletRandomDataset(TripletDataset):
 
         if index_list is None:
             index_list = [i for i in range(len(np_dataset))]
+        self.index_list = index_list
 
         self.augmentations = augmentations
         self.patch_size = patch_size
