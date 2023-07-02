@@ -11,3 +11,4 @@ pandas
 torchgeo
 rasterio
 geopandas
+albumentations
