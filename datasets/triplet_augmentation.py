@@ -67,13 +67,13 @@ def make_train_aug(size=(512, 512)):
     random_crop_single = A.Compose([A.RandomCrop(height=h, width=w, always_apply=True),])
 
     return {
-        'GEOMETRIC_DOUBLE': geometric_double,
-        'GEOMETRIC_SINGLE': geometric_single,
-        'FINE_SINGLE': fine_single,
-        'COLOR_DOUBLE': color_double,
-        'COLOR_SINGLE': color_single,
-        'RANDOM_CROP_DOUBLE': random_crop_double,
-        'RANDOM_CROP_SINGLE': random_crop_single,
+        GEOMETRIC_DOUBLE: geometric_double,
+        GEOMETRIC_SINGLE: geometric_single,
+        FINE_SINGLE: fine_single,
+        COLOR_DOUBLE: color_double,
+        COLOR_SINGLE: color_single,
+        RANDOM_CROP_SINGLE: random_crop_double,
+        RANDOM_CROP_DOUBLE: random_crop_single,
         }
 
 
@@ -103,11 +103,11 @@ def make_no_aug(size=(512, 512)):
     random_crop_single = A.Compose([A.RandomCrop(height=h, width=w, always_apply=True),])
 
     return {
-        'GEOMETRIC_DOUBLE': geometric_double,
-        'GEOMETRIC_SINGLE': geometric_single,
-        'FINE_SINGLE': fine_single,
-        'COLOR_DOUBLE': color_double,
-        'COLOR_SINGLE': color_single,
-        'RANDOM_CROP_DOUBLE': random_crop_double,
-        'RANDOM_CROP_SINGLE': random_crop_single,
+        GEOMETRIC_DOUBLE: geometric_double,
+        GEOMETRIC_SINGLE: geometric_single,
+        FINE_SINGLE: fine_single,
+        COLOR_DOUBLE: color_double,
+        COLOR_SINGLE: color_single,
+        RANDOM_CROP_SINGLE: random_crop_double,
+        RANDOM_CROP_DOUBLE: random_crop_single,
         }
