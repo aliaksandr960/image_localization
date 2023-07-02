@@ -1,0 +1,13 @@
+torch
+torchvision
+numpy
+tqdm
+opencv-python
+timm
+jupyterlab
+ipywidgets
+matplotlib
+pandas
+torchgeo
+rasterio
+geopandas
