@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 
 import albumentations as A
+from tqdm import trange
 
 from torch.utils.data import Dataset
 
@@ -13,28 +14,20 @@ from triplet_augmentation import make_no_aug
 
 
 class TripletDataset(Dataset):
-    def __init__(self, np_dataset, patch_size, index_list=None, resize=None):
-        pass
-
-    def __getitem__(self, index):
-        raise NotImplemented()
-    
-    def __len__(self):
+    def __getitem__(self, index) -> tuple(np.ndarray, np.ndarray, np.ndarray):
         raise NotImplemented()
 
 
-class GlobalTripletRandomDataset(Dataset):
-    def __init__(self, np_dataset, patch_size, index_list=None, resize=None,
-                 augmentations=make_no_aug()):
+
+class GlobalTripletRandomDataset(TripletDataset):
+    def __init__(self, np_dataset, augmentations, index_list=None):
         self.np_dataset = np_dataset
-        self.patch_size = patch_size
 
         if index_list is None:
             index_list = [i for i in range(len(np_dataset))]
         self.index_list = index_list
 
         self.augmentations = augmentations
-        self.resize = resize
         
     def __getitem__(self, index):
         i = self.index_list[index]
@@ -78,24 +71,19 @@ class GlobalTripletRandomDataset(Dataset):
         sample = aug[RANDOM_CROP_SINGLE](image=negative)
         negative = sample['image']
 
-        
-        anchor, positive, negative = [cv2.resize(i, self.patch_size) for i in [anchor, positive, negative]]
-        if self.resize is not None:
-            anchor, positive, negative = [cv2.resize(i, self.resize) for i in [anchor, positive, negative]]
         return anchor, positive, negative
     
     def __len__(self):
         return len(self.index_list)
 
 
-class GlobalTripletStaticDataset(Dataset):
-    def __init__(self, np_dataset, patch_size, index_list=None, resize=None):
+class GlobalTripletStaticDataset(TripletDataset):
+    def __init__(self, np_dataset, patch_size, index_list=None):
         
         self.np_dataset = np_dataset
         if index_list is None:
             index_list = [i for i in range(len(np_dataset))]
         self.patch_size = patch_size
-        self.resize = resize
         
         # Make pseudorandom ordering
         key_f = lambda x: hashlib.md5(str(x).encode()).hexdigest()
@@ -115,19 +103,16 @@ class GlobalTripletStaticDataset(Dataset):
         
         sample = self.crop(image=anchor, positive=positive, negative=negative)
         anchor, positive, negative = sample['image'], sample['positive'], sample['negative']
-        
-        anchor, positive, negative = [cv2.resize(i, self.patch_size) for i in [anchor, positive, negative]]
-        if self.resize is not None:
-            anchor, positive, negative = [cv2.resize(i, self.resize) for i in [anchor, positive, negative]]
+
         return anchor, positive, negative
     
     def __len__(self):
         return len(self.index_list)
 
 
-class LocalTripletRandomDataset(Dataset):
-    def __init__(self, np_dataset, patch_size, index_list=None, resize=None,
-                 margin=64, augmentations=make_no_aug()):
+class LocalTripletRandomDataset(TripletDataset):
+    def __init__(self, np_dataset, patch_size, augmentations,
+                 index_list=None, margin=64):
         self.np_dataset = np_dataset
 
         if index_list is None:
@@ -135,7 +120,6 @@ class LocalTripletRandomDataset(Dataset):
 
         self.augmentations = augmentations
         self.patch_size = patch_size
-        self.resize = resize
         self.margin = margin
         
     def __getitem__(self, index):
@@ -183,20 +167,15 @@ class LocalTripletRandomDataset(Dataset):
         # Positive and negative should have the same color
         sample = aug[COLOR_DOUBLE](image=positive_crop, negative=negative_crop)
         positive_crop, negative_crop = sample['image'], sample['negative']
-        
-        anchor, positive, negative = [cv2.resize(i, self.patch_size) for i in [anchor, positive, negative]]
-        if self.resize is not None:
-            anchor_crop = cv2.resize(anchor_crop, self.resize)
-            positive_crop = cv2.resize(positive_crop, self.resize)
-            negative_crop = cv2.resize(negative_crop, self.resize)
+
         return anchor_crop, positive_crop, negative_crop
     
     def __len__(self):
         return len(self.index_list)
 
 
-class LocalTripletStaticDataset(Dataset):
-    def __init__(self, np_dataset, patch_size, index_list=None, resize=None,
+class LocalTripletStaticDataset(TripletDataset):
+    def __init__(self, np_dataset, patch_size, index_list=None,
                   max_size=(1024, 1024), margin=64):
         self.np_dataset = np_dataset
 
@@ -255,12 +234,7 @@ class LocalTripletStaticDataset(Dataset):
                 
         nh2, nw2 = nh1 + patch_h, nw1 + patch_w
         negative_crop = positive[nh1:nh2, nw1:nw2, :]
-        
-        anchor, positive, negative = [cv2.resize(i, self.patch_size) for i in [anchor, positive, negative]]
-        if self.resize is not None:
-            anchor_crop = cv2.resize(anchor_crop, self.resize)
-            positive_crop = cv2.resize(positive_crop, self.resize)
-            negative_crop = cv2.resize(negative_crop, self.resize)
+
         return anchor_crop, positive_crop, negative_crop
     
     def __len__(self):

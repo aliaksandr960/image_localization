@@ -77,7 +77,7 @@ def make_train_aug(size=(512, 512)):
         }
 
 
-def make_no_aug(size=(512, 512)):
+def random_crop_aug(size=(512, 512)):
     h, w = size
     geometric_aug = [
         A.PadIfNeeded(min_height=h, min_width=w, always_apply=True, border_mode=0),
