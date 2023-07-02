@@ -83,7 +83,7 @@ class GlobalTripletStaticDataset(TripletDataset):
         
         # Make pseudorandom ordering
         key_f = lambda x: hashlib.md5(str(x).encode()).hexdigest()
-        self.index_list = sorted(self.index_list, key=key_f)
+        self.index_list = sorted(index_list, key=key_f)
         
         self.crop = A.Compose([A.CenterCrop(height=patch_size[0], width=patch_size[1],
                                             always_apply=True),],
