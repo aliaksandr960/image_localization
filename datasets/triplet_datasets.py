@@ -11,7 +11,7 @@ from datasets.triplet_augmentation import RANDOM_CROP_SINGLE, RANDOM_CROP_DOUBLE
 
 
 class TripletDataset(Dataset):
-    def __getitem__(self, index) -> tuple(np.ndarray, np.ndarray, np.ndarray):
+    def __getitem__(self, index):
         raise NotImplemented()
 
 
