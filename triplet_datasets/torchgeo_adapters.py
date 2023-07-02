@@ -1,5 +1,21 @@
 import numpy as np
+from tqdm import trange
 from torch.utils.data import Dataset
+
+
+def filter_tg_indexes_by_max_change(tg_dataset, change_threshold):
+    tg_change_list = []
+    area = None
+    for n in trange(len(tg_dataset)):
+        i = tg_dataset[n]
+        if area is None:
+            area = i['image'].shape[2] * i['image'].shape[3]
+        mask = i['mask']
+        value = np.sum(mask.numpy().clip(0, 1)) / area
+        tg_change_list.append(value)
+
+    index_list = [n for n, v in enumerate(tg_change_list) if v < change_threshold]
+    return index_list
 
 
 class TgChangeDetectionAsNumpy(Dataset):
