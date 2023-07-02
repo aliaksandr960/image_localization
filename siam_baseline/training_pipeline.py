@@ -1,5 +1,8 @@
-CUDA = "cuda:0"
-CPU = "cpu"
+import csv
+import torch
+import torch.nn.functional as F
+from tqdm import tqdm
+
 
 EPOCH_KEY = 'EPOCH'
 BATCH_KEY = 'BATCH'
@@ -78,6 +81,7 @@ def run_trining(device, optimizer, net, criterion, epoch_count,
         avg_train_loss = total_train_loss / len(train_loader)
         avg_valid_loss = total_valid_loss / len(valid_loader)
         avg_valid_acc = total_valid_acc / len(valid_loader)
+
         # print statistics
         history_item = {EPOCH_KEY: epoch,
                         BATCH_KEY: batch_n,
@@ -101,65 +105,5 @@ def run_trining(device, optimizer, net, criterion, epoch_count,
             writer = csv.DictWriter(f, fieldnames=fields)
             writer.writeheader() 
             writer.writerows(valid_history)
-
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
-net = TimmMobilenet('mobilenetv3_small_100').to(device)
-
-
-batch_size = 16
-epoch_count = 2
-epoch_max_batch = 64
-num_workers = 2
-
-criterion = nn.TripletMarginLoss()
-optimizer = optim.Adam(net.parameters(), lr=0.0001)
-
-levircdplus_tg_train = torchgeo.datasets.LEVIRCDPlus(
-    root='data/levircdplus_train',
-    split='train',
-    transforms=None,
-    download=True,
-    checksum=False
-)
-
-train_index_list = filter_tg_indexes_by_max_change(levircdplus_tg_train, 0.025)
-
-# train_dataset = GlobalTripletRandomDataset(levircdplus_tg_train,
-#                                            train_index_list,
-#                                            augmentations=make_no_aug())
-
-train_dataset = LocalTripletRandomDataset(levircdplus_tg_train,
-                                           train_index_list,
-                                           augmentations=make_no_aug())
-
-train_loader = torch.utils.data.DataLoader(train_dataset, batch_size=batch_size,
-                                           shuffle=True, num_workers=num_workers)
-
-
-levircdplus_tg_valid = torchgeo.datasets.LEVIRCDPlus(
-    root='data/levircdplus_train',
-    split='test',
-    transforms=None,
-    download=True,
-    checksum=False
-)
-
-valid_index_list = filter_tg_indexes_by_max_change(levircdplus_tg_valid, 0.025)
-
-
-valid_dataset = LocalTripletStaticDataset(levircdplus_tg_valid,
-                                          valid_index_list)
-
-valid_loader = torch.utils.data.DataLoader(valid_dataset, batch_size=1,
-                                           shuffle=False, num_workers=num_workers)
-
-train_history_path = '/kaggle/working/t_history.csv'
-valid_history_path = '/kaggle/working/v_history.csv'
-log_path = '/kaggle/working/'
-
-
-run_trining(device, optimizer, net, criterion, epoch_count,
-            train_loader, valid_loader, epoch_max_batch,
-            train_history_path, valid_history_path, log_path)
+    
+    return train_history, valid_history
