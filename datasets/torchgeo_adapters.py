@@ -1,3 +1,4 @@
+import numpy as np
 from torch.utils.data import Dataset
 
 
@@ -29,7 +30,7 @@ class TgSegmentationAsNumpy(Dataset):
     def __getitem__(self, idx):
         sample = self.tg_dataset[idx]
         image = sample['image'].permute(1, 2, 0).cpu().numpy().astype(np.uint8)
-        return image
+        return image, image.copy()
 
     def __len__(self):
         return len(self.tg_dataset)
