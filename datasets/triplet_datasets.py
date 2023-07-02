@@ -1,22 +1,18 @@
 import hashlib
-import cv2
 import numpy as np
 
 import albumentations as A
-from tqdm import trange
 
 from torch.utils.data import Dataset
 
-from triplet_augmentation import GEOMETRIC_DOUBLE, GEOMETRIC_SINGLE, FINE_SINGLE
-from triplet_augmentation import COLOR_DOUBLE, COLOR_SINGLE
-from triplet_augmentation import RANDOM_CROP_SINGLE, RANDOM_CROP_DOUBLE
-from triplet_augmentation import make_no_aug
+from datasets.triplet_augmentation import GEOMETRIC_DOUBLE, GEOMETRIC_SINGLE, FINE_SINGLE
+from datasets.triplet_augmentation import COLOR_DOUBLE, COLOR_SINGLE
+from datasets.triplet_augmentation import RANDOM_CROP_SINGLE, RANDOM_CROP_DOUBLE
 
 
 class TripletDataset(Dataset):
     def __getitem__(self, index) -> tuple(np.ndarray, np.ndarray, np.ndarray):
         raise NotImplemented()
-
 
 
 class GlobalTripletRandomDataset(TripletDataset):
@@ -183,7 +179,6 @@ class LocalTripletStaticDataset(TripletDataset):
             index_list = [i for i in range(len(np_dataset))]
 
         self.patch_size = patch_size
-        self.resize = resize
         self.margin = margin
         
         self.max_size = max_size
