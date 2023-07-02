@@ -178,6 +178,7 @@ class LocalTripletStaticDataset(TripletDataset):
 
         if index_list is None:
             index_list = [i for i in range(len(np_dataset))]
+        self.index_list = index_list
 
         self.patch_size = patch_size
         self.margin = margin
@@ -212,7 +213,7 @@ class LocalTripletStaticDataset(TripletDataset):
         available_h = [i for i in range(start_h, end_h) if i not in not_avilable_h]
         available_h_count = len(available_h)
         for c in self.h_index_list:
-            if c in not_avilable_w:
+            if c in not_avilable_h:
                 continue
             if c < available_h_count:
                 nh1 = c
