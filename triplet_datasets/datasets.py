@@ -16,7 +16,7 @@ class TripletDataset(Dataset):
 
 
 class GlobalTripletRandomDataset(TripletDataset):
-    def __init__(self, np_dataset, augmentations, index_list=None):
+    def __init__(self, np_dataset, augmentations, index_list=None, postprocess=None):
         self.np_dataset = np_dataset
 
         if index_list is None:
@@ -24,6 +24,7 @@ class GlobalTripletRandomDataset(TripletDataset):
         self.index_list = index_list
 
         self.augmentations = augmentations
+        self.postprocess = postprocess
         
     def __getitem__(self, index):
         i = self.index_list[index]
@@ -67,6 +68,8 @@ class GlobalTripletRandomDataset(TripletDataset):
         sample = aug[RANDOM_CROP_SINGLE](image=negative)
         negative = sample['image']
 
+        if self.postprocess is not None:
+            anchor, positive, negative = [self.postprocess(i) for i in (anchor, positive, negative)]
         return anchor, positive, negative
     
     def __len__(self):
@@ -74,7 +77,7 @@ class GlobalTripletRandomDataset(TripletDataset):
 
 
 class GlobalTripletStaticDataset(TripletDataset):
-    def __init__(self, np_dataset, patch_size, index_list=None):
+    def __init__(self, np_dataset, patch_size, index_list=None, postprocess=None):
         
         self.np_dataset = np_dataset
         if index_list is None:
@@ -89,6 +92,7 @@ class GlobalTripletStaticDataset(TripletDataset):
                                             always_apply=True),],
                               additional_targets={'positive': 'image',
                                                   'negative': 'image'})
+        self.postprocess = postprocess
         
     def __getitem__(self, index):
         i = self.index_list[index]
@@ -100,6 +104,8 @@ class GlobalTripletStaticDataset(TripletDataset):
         sample = self.crop(image=anchor, positive=positive, negative=negative)
         anchor, positive, negative = sample['image'], sample['positive'], sample['negative']
 
+        if self.postprocess is not None:
+            anchor, positive, negative = [self.postprocess(i) for i in (anchor, positive, negative)]
         return anchor, positive, negative
     
     def __len__(self):
@@ -108,7 +114,7 @@ class GlobalTripletStaticDataset(TripletDataset):
 
 class LocalTripletRandomDataset(TripletDataset):
     def __init__(self, np_dataset, patch_size, augmentations,
-                 index_list=None, margin=64):
+                 index_list=None, margin=64, postprocess=None):
         self.np_dataset = np_dataset
 
         if index_list is None:
@@ -118,6 +124,8 @@ class LocalTripletRandomDataset(TripletDataset):
         self.augmentations = augmentations
         self.patch_size = patch_size
         self.margin = margin
+
+        self.postprocess = postprocess
         
     def __getitem__(self, index):
         i = self.index_list[index]
@@ -165,6 +173,8 @@ class LocalTripletRandomDataset(TripletDataset):
         sample = aug[COLOR_DOUBLE](image=positive_crop, negative=negative_crop)
         positive_crop, negative_crop = sample['image'], sample['negative']
 
+        if self.postprocess is not None:
+            anchor_crop, positive_crop, negative_crop = [self.postprocess(i) for i in (anchor_crop, positive_crop, negative_crop)]
         return anchor_crop, positive_crop, negative_crop
     
     def __len__(self):
@@ -173,7 +183,7 @@ class LocalTripletRandomDataset(TripletDataset):
 
 class LocalTripletStaticDataset(TripletDataset):
     def __init__(self, np_dataset, patch_size, index_list=None,
-                  max_size=(1024, 1024), margin=64):
+                  max_size=(1024, 1024), margin=64, postprocess=None):
         self.np_dataset = np_dataset
 
         if index_list is None:
@@ -192,6 +202,8 @@ class LocalTripletStaticDataset(TripletDataset):
         w_index_list = [i for i in range(max_w)]
         key_wf = lambda x: hashlib.md5(('w' + str(x)).encode()).hexdigest()
         self.w_index_list = sorted(w_index_list, key=key_wf)
+
+        self.postprocess = postprocess
         
     def __getitem__(self, index):
         i = self.index_list[index]
@@ -232,6 +244,8 @@ class LocalTripletStaticDataset(TripletDataset):
         nh2, nw2 = nh1 + patch_h, nw1 + patch_w
         negative_crop = positive[nh1:nh2, nw1:nw2, :]
 
+        if self.postprocess is not None:
+            anchor_crop, positive_crop, negative_crop = [self.postprocess(i) for i in (anchor_crop, positive_crop, negative_crop)]
         return anchor_crop, positive_crop, negative_crop
     
     def __len__(self):
