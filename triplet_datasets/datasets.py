@@ -1,7 +1,9 @@
 import hashlib
+import random
 import numpy as np
 
 import albumentations as A
+from tqdm import tqdm, trange
 
 from torch.utils.data import Dataset
 
@@ -250,3 +252,48 @@ class LocalTripletStaticDataset(TripletDataset):
     
     def __len__(self):
         return len(self.index_list)
+
+
+class MemCachedDataset(Dataset):
+    def __init__(self, dataset, max_count=None, shuffle=False):
+        self.dataset = dataset
+        self.cache = []
+
+        self.max_count = None
+        if max_count is None:
+            self.max_count = len(self.dataset)
+        else:
+            self.max_count = min(max_count, len(self.dataset))
+
+        index_list = [i for i in range(len(dataset))]
+        if shuffle:
+            random.shuffle(index_list)
+
+        if max_count is not None:
+            index_list = index_list[:max_count]
+
+        for n in tqdm(index_list):
+            self.cache.append(self.dataset[n])
+
+
+    def __getitem__(self, index):
+        return self.cache[index]
+
+    def __len__(self):
+        return self.max_count
+
+
+class MergedDataset(Dataset):
+    def __init__(self, dataset_list):
+        self.dataset_list = dataset_list
+
+    def __getitem__(self, index):
+        act_max = 0
+        for d in self.dataset_list:
+            act_max = act_max + len(d)
+            if act_max > index:
+                i = index - (act_max - len(d))
+                return d[i]
+
+    def __len__(self):
+        return sum([len(i) for i in self.dataset_list])
