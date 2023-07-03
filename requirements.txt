@@ -12,3 +12,4 @@ torchgeo
 rasterio
 geopandas
 albumentations
+rarfile
