@@ -17,7 +17,7 @@ def make_train_aug(size=(512, 512)):
         A.Transpose(p=0.5),
         A.RandomRotate90(p=0.75),
         A.ShiftScaleRotate(scale_limit=(-0.5, 0.5), shift_limit=0, rotate_limit=45, p=0.9),
-        A.Perspective(p=0.2),
+        A.Perspective(p=0.33),
         A.PadIfNeeded(min_height=h, min_width=w, always_apply=True, border_mode=0),
         ]
 
@@ -27,8 +27,6 @@ def make_train_aug(size=(512, 512)):
 
     fine_aug = [
         A.Rotate(limit=4, interpolation=1, p=0.5),
-        A.RandomSunFlare(p=0.05),
-        A.RandomFog(p=0.05),
         A.ElasticTransform(p=0.25),
     ]
 
