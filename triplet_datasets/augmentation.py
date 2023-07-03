@@ -26,7 +26,7 @@ def make_train_aug(size=(512, 512)):
     geometric_single = A.Compose(geometric_aug)
 
     fine_aug = [
-        A.Rotate(limit=2, interpolation=1, p=0.5),
+        A.Rotate(limit=4, interpolation=1, p=0.5),
         A.RandomSunFlare(p=0.05),
         A.RandomFog(p=0.05),
         A.ElasticTransform(p=0.25),
@@ -49,14 +49,14 @@ def make_train_aug(size=(512, 512)):
             A.Emboss(p=1),
             A.Sharpen(p=1),
             A.JpegCompression(p=1),
-        ], p=1),
+        ], p=0.75),
 
         A.OneOf([
             A.Blur(blur_limit=3, p=1),
             A.GaussianBlur(blur_limit=3, p=1),
             A.MedianBlur(blur_limit=3, p=1),
             A.MotionBlur(blur_limit=3, p=1),    
-        ], p=1),
+        ], p=0.75),
         ]
 
     color_double = A.Compose(color_aug, additional_targets={'negative': 'image'})
