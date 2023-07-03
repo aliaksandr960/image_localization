@@ -12,10 +12,11 @@ VAL_LOSS_KEY = 'VAL_LOSS'
 VAL_ACC_KEY = 'VAL_ACC'
 
 
-def run_trining(device, optimizer, net, criterion, epoch_count,
-                train_loader, valid_loader, epoch_max_batch,
-                train_history_path, valid_history_path,
-                log_path,):
+def run_trining(net, criterion, optimizer,
+                epoch_count, epoch_max_batch,
+                train_loader, valid_loader,
+                train_history_path, valid_history_path, log_path,
+                device):
     
     # Evaluate batch
     def shared_step(batch, train=True):

@@ -64,6 +64,15 @@ valid_history_path = './working/v_history.csv'
 log_path = './working/'
 
 # Run training
-run_trining(device, optimizer, net, criterion, epoch_count,
-            train_loader, valid_loader, epoch_max_batch,
-            train_history_path, valid_history_path, log_path)
+run_trining(net=net,
+            criterion=criterion,
+            optimizer=optimizer,
+            epoch_count=epoch_count,
+            epoch_max_batch=epoch_max_batch,
+            train_loader=train_loader,
+            valid_loader=valid_loader,
+            train_history_path=train_history_path,
+            valid_history_path=valid_history_path,
+            log_path=log_path,
+            device=device
+            )
